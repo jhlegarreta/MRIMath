@@ -37,7 +37,6 @@ def load_data(training_directory, start, finish):
     return X_train, segments
     
 emailHandler = EmailHandler()
-emailHandler.sendMessage("danielenricocahall@gmail.com")
 
 
 input_img = Input(shape=(240, 240,1))  
