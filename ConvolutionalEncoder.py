@@ -44,7 +44,7 @@ input_img = Input(shape=(240, 240,1))
 F = 3
 S = 2;
 
-x = Conv2D(105, (F, F), activation='relu', padding='same')(input_img)
+x = Conv2D(95, (F, F), activation='relu', padding='same')(input_img)
 x = Conv2D(75, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(45, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(15, (F, F), activation='relu', padding='same')(x)
@@ -53,10 +53,10 @@ x = UpSampling2D((S, S))(encoded)
 x = Conv2D(15, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(45, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(75, (F, F), activation='relu', padding='same')(x)
-x = Conv2D(105, (F, F), activation='relu', padding='same')(x)
+x = Conv2D(95, (F, F), activation='relu', padding='same')(x)
 decoded = Conv2D(1, (F, F), activation='relu', padding='same')(x)
 
-training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 100)
+training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 85)
 
 testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',140,170)
 
