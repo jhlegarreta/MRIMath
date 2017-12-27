@@ -1,31 +1,16 @@
-import sys
-import matplotlib.image as mpimg
 
 from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D
 from keras.models import Model
 import numpy as np
-#import scipy
 from keras.callbacks import TensorBoard
 import os
 import cv2
-#from PIL import Image
-#import Stack
-import smtplib 
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from EmailHandler import EmailHandler
 
 def get_im(path):
     path=path.decode()
-   # img = mpimg.imread(path)
-# img = Image.open(path)
     img = cv2.imread(path,0)
- #   img = scipy.ndimage.imread(path)
-    #scipy.misc.imshow(img)    #cv2.waitKey()
-    #resized = cv2.resize(img, (128, 96))
     return img
-
-def to_binary(img, lower, upper):
-    return (lower < img) & (img < upper)
 
 def load_data(training_directory, start, finish):
     X_train = []
@@ -51,32 +36,15 @@ def load_data(training_directory, start, finish):
 
     return X_train, segments
     
-server = smtplib.SMTP('smtp.gmail.com', 587)
-server.starttls()
-server.login("mrimathnotifier@gmail.com", "mrimathpw")
-msg = MIMEMultipart()
-msg['From']  = "mrimathnotifier@gmail.com"
-msg['To'] = "danielenricocahall@gmail.com"
-msg['Subject'] = "MRIMath Notification Testing"
-body = "Hello! If you're receiving this, it's because Danny is currently testing to make sure the MRIMath Notifications are working. From now on, you can receive emails to notify you when your run on the HPC has completed."
-msg.attach(MIMEText(body, 'plain'))
-text = msg.as_string()
-server.sendmail("mrimathnotifier@gmail.com", "danielenricocahall@gmail.com", text)
-server.sendmail("mrimathnotifier@gmail.com", "hfshaykh@uabmc.edu", text)
-server.sendmail("mrimathnotifier@gmail.com", "alenagusevarus@gmail.com", text)
-server.sendmail("mrimathnotifier@gmail.com", "bouaynaya@rowan.edu", text)
-server.sendmail("mrimathnotifier@gmail.com", "derad6@rowan.edu", text)
-server.sendmail("mrimathnotifier@gmail.com", "palumb48@students.rowan.edu", text)
+emailHandler = EmailHandler()
+emailHandler.prepareMessage("Testing", "Testing")
+emailHandler.sendMessage("danielenricocahall@gmail.com")
 
 
-server.quit()
 input_img = Input(shape=(240, 240,1))  
-#stack = Stack();
 
 F = 3
 S = 2;
-
-
 
 x = Conv2D(105, (F, F), activation='relu', padding='same')(input_img)
 x = Conv2D(75, (F, F), activation='relu', padding='same')(x)
