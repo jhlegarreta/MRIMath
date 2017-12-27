@@ -58,9 +58,9 @@ x = Conv2D(75, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(105, (F, F), activation='relu', padding='same')(x)
 decoded = Conv2D(1, (F, F), activation='relu', padding='same')(x)
 
-training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 85)
+training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 107)
 
-testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',85,107)
+testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',130,170)
 
 segmentation_bank = [[] for _ in range(8)]
 for i in range(1,8):
