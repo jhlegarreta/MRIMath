@@ -37,7 +37,6 @@ def load_data(training_directory, start, finish):
     return X_train, segments
     
 emailHandler = EmailHandler()
-emailHandler.prepareMessage("Testing", "Testing")
 emailHandler.sendMessage("danielenricocahall@gmail.com")
 
 
@@ -86,10 +85,11 @@ for i in range(1,8):
                 validation_data=(testing, segments2[i]),
                 callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
     # serialize model to JSON
+    emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i));
+    emailHandler.sendMessage("Danny")
     segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'.h5')
 
-
-
+emailHandler.finish()
 
 
 
