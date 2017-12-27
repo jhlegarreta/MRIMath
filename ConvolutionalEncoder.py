@@ -44,16 +44,16 @@ input_img = Input(shape=(240, 240,1))
 F = 3
 S = 2;
 
-x = Conv2D(95, (F, F), activation='relu', padding='same')(input_img)
-x = Conv2D(75, (F, F), activation='relu', padding='same')(x)
-x = Conv2D(45, (F, F), activation='relu', padding='same')(x)
+x = Conv2D(90, (F, F), activation='relu', padding='same')(input_img)
+x = Conv2D(65, (F, F), activation='relu', padding='same')(x)
+x = Conv2D(35, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(15, (F, F), activation='relu', padding='same')(x)
 encoded = MaxPooling2D((S, S), padding='same')(x)
 x = UpSampling2D((S, S))(encoded)
 x = Conv2D(15, (F, F), activation='relu', padding='same')(x)
-x = Conv2D(45, (F, F), activation='relu', padding='same')(x)
-x = Conv2D(75, (F, F), activation='relu', padding='same')(x)
-x = Conv2D(95, (F, F), activation='relu', padding='same')(x)
+x = Conv2D(35, (F, F), activation='relu', padding='same')(x)
+x = Conv2D(65, (F, F), activation='relu', padding='same')(x)
+x = Conv2D(90, (F, F), activation='relu', padding='same')(x)
 decoded = Conv2D(1, (F, F), activation='relu', padding='same')(x)
 
 training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 85)
@@ -79,7 +79,7 @@ for i in range(1,8):
     segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
     segmentation_bank[i].fit(training, segments[i],
                 epochs=30,
-                batch_size=60,
+                batch_size=50,
                 shuffle=True,
                 validation_data=(testing, segments2[i]),
                 callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
