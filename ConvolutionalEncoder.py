@@ -56,9 +56,9 @@ x = Conv2D(75, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(105, (F, F), activation='relu', padding='same')(x)
 decoded = Conv2D(1, (F, F), activation='relu', padding='same')(x)
 
-training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 107)
+training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 100)
 
-testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',130,170)
+testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',140,170)
 
 segmentation_bank = [[] for _ in range(8)]
 for i in range(1,8):
@@ -79,7 +79,7 @@ for i in range(1,8):
     segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
     segmentation_bank[i].fit(training, segments[i],
                 epochs=30,
-                batch_size=50,
+                batch_size=100,
                 shuffle=True,
                 validation_data=(testing, segments2[i]),
                 callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
