@@ -79,7 +79,7 @@ for i in range(1,8):
     segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
     segmentation_bank[i].fit(training, segments[i],
                 epochs=30,
-                batch_size=100,
+                batch_size=60,
                 shuffle=True,
                 validation_data=(testing, segments2[i]),
                 callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
