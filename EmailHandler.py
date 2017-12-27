@@ -11,12 +11,12 @@ from email.mime.text import MIMEText
 
 class EmailHandler:
     addr = "mrimathnotifier@gmail.com"
-    addressBook = {"Danny": "danielenricocahall@gmail.com", 
-         "Dr.Bouaynaya": "bouaynaya@rowan.edu", 
-         "Oliver": "palumb48@students.rowan.edu",
-         "Dimah": "derad6@rowan.edu",
-         "Alena": "alenagusevarus@gmail.com",
-         "Hassan": "hfshaykh@uabmc.edu"}
+    addressBook = {'Danny': 'danielenricocahall@gmail.com', 
+         'Dr.Bouaynaya': 'bouaynaya@rowan.edu', 
+         'Oliver': 'palumb48@students.rowan.edu',
+         'Dimah': "derad6@rowan.edu",
+         'Alena': 'alenagusevarus@gmail.com',
+         'Hassan': 'hfshaykh@uabmc.edu'}
  
     
     def __init__(self):
