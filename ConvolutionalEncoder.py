@@ -6,6 +6,7 @@ from keras.callbacks import TensorBoard
 import os
 import cv2
 from EmailHandler import EmailHandler
+from datetime import datetime
 
 def get_im(path):
     path=path.decode()
@@ -58,11 +59,12 @@ decoded = Conv2D(1, (F, F), activation='relu', padding='same')(x)
 
 training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 85)
 
-testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',140,170)
+testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',85,106)
 
 segmentation_bank = [[] for _ in range(8)]
 for i in range(1,8):
     print('Training network: ' + str(i))
+    emailHandler.prepareMessage("Training Started!", "Started training network " + str(i) + " at " + str(datetime.now()));
     segmentation_bank[i] = Model(input_img, decoded)
     segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
     n_imgs = len(training)
@@ -83,10 +85,9 @@ for i in range(1,8):
                 shuffle=True,
                 validation_data=(testing, segments2[i]),
                 callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
-    # serialize model to JSON
-    emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i));
-    emailHandler.sendMessage("Danny")
     segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'.h5')
+    emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
+    emailHandler.sendMessage("Danny")
 
 emailHandler.finish()
 
