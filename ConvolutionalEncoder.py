@@ -63,8 +63,6 @@ testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Image
 segmentation_bank = [[] for _ in range(8)]
 for i in range(1,8):
     print('Training network: ' + str(i))
-    segmentation_bank[i] = Model(input_img, decoded)
-    segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
     n_imgs = len(training)
     training = np.array(training)
     training =training.reshape(n_imgs,240,240,1)
@@ -77,7 +75,9 @@ for i in range(1,8):
     testing= testing.astype('float32') / 255;
     segments2[i] = np.array(segments2[i]);
     segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
+    segmentation_bank[i] = Model(input_img, decoded)
     segmentation_bank[i] = multi_gpu_model(segmentation_bank[i], 4)
+    segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
     segmentation_bank[i].fit(training, segments[i],
                 epochs=30,
                 batch_size=50,
