@@ -65,6 +65,7 @@ segmentation_bank = [[] for _ in range(8)]
 for i in range(1,8):
     print('Training network: ' + str(i))
     emailHandler.prepareMessage("Training Started!", "Started training network " + str(i) + " at " + str(datetime.now()));
+    emailHandler.sendMessage("Danny")
     segmentation_bank[i] = Model(input_img, decoded)
     segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
     n_imgs = len(training)
