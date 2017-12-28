@@ -8,7 +8,6 @@ import cv2
 from EmailHandler import EmailHandler
 from datetime import datetime
 from keras.utils.training_utils import multi_gpu_model
-import tensorflow as tf
 
 
 def get_im(path):
@@ -62,119 +61,38 @@ training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Image
 testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',85,106)
 
 segmentation_bank = [[] for _ in range(8)]
-for i in range(0,4,4):
-    with tf.device("/gpu:0"):
-        print('Training network: ' + str(i))
-        n_imgs = len(training)
-        training = np.array(training)
-        training =training.reshape(n_imgs,240,240,1)
-        training = training.astype('float32') / 255;
-        segments[i] = np.array(segments[i]);
-        segments[i] = segments[i].reshape(n_imgs,240,240,1)
-        n_imgs2 = len(testing)
-        testing = np.array(testing)
-        testing =testing.reshape(n_imgs2,240,240,1)
-        testing= testing.astype('float32') / 255;
-        segments2[i] = np.array(segments2[i]);
-        segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
-        segmentation_bank[i] = Model(input_img, decoded)
-        segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
-        segmentation_bank[i].fit(training, segments[i],
+for i in range(0,8):
+    print('Training network: ' + str(i))
+    n_imgs = len(training)
+    training = np.array(training)
+    training =training.reshape(n_imgs,240,240,1)
+    training = training.astype('float32') / 255;
+    segments[i] = np.array(segments[i]);
+    segments[i] = segments[i].reshape(n_imgs,240,240,1)
+    n_imgs2 = len(testing)
+    testing = np.array(testing)
+    testing =testing.reshape(n_imgs2,240,240,1)
+    testing= testing.astype('float32') / 255;
+    segments2[i] = np.array(segments2[i]);
+    segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
+    segmentation_bank[i] = Model(input_img, decoded)
+    segmentation_bank[i] = multi_gpu_model(segmentation_bank[i], 4)
+    segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
+    segmentation_bank[i].fit(training, segments[i],
                 epochs=30,
                 batch_size=50,
                 shuffle=True,
                 validation_data=(testing, segments2[i]),
                 callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
-        segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'.h5')
-        emailHandler = EmailHandler()
-        emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
-        emailHandler.sendMessage("Danny")
-        emailHandler.finish()
-        
-    with tf.device("/gpu:1"):
-        print('Training network: ' + str(i+1))
-        n_imgs = len(training)
-        training = np.array(training)
-        training =training.reshape(n_imgs,240,240,1)
-        training = training.astype('float32') / 255;
-        segments[i+1] = np.array(segments[i]);
-        segments[i+1] = segments[i+1].reshape(n_imgs,240,240,1)
-        n_imgs2 = len(testing)
-        testing = np.array(testing)
-        testing =testing.reshape(n_imgs2,240,240,1)
-        testing= testing.astype('float32') / 255;
-        segments2[i+1] = np.array(segments2[i+1]);
-        segments2[i+1] = segments2[i+1].reshape(n_imgs2,240,240,1)
-        segmentation_bank[i+1] = Model(input_img, decoded)
-        segmentation_bank[i+1].compile(optimizer='nadam', loss='mean_squared_error')
-        segmentation_bank[i+1].fit(training, segments[i],
-                epochs=30,
-                batch_size=50,
-                shuffle=True,
-                validation_data=(testing, segments2[i]),
-                callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
-        segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i+1) +'.h5')
-        emailHandler = EmailHandler()
-        emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i+1) + " at " + str(datetime.now()));
-        emailHandler.sendMessage("Danny")
-        emailHandler.finish()
-        
-    with tf.device("/gpu:2"):
-        print('Training network: ' + str(i+2))
-        n_imgs = len(training)
-        training = np.array(training)
-        training =training.reshape(n_imgs,240,240,1)
-        training = training.astype('float32') / 255;
-        segments[i+2] = np.array(segments[i]);
-        segments[i+2] = segments[i+2].reshape(n_imgs,240,240,1)
-        n_imgs2 = len(testing)
-        testing = np.array(testing)
-        testing =testing.reshape(n_imgs2,240,240,1)
-        testing= testing.astype('float32') / 255;
-        segments2[i+2] = np.array(segments2[i+2]);
-        segments2[i+2] = segments2[i+2].reshape(n_imgs2,240,240,1)
-        segmentation_bank[i+2] = Model(input_img, decoded)
-        segmentation_bank[i+2].compile(optimizer='nadam', loss='mean_squared_error')
-        segmentation_bank[i+2].fit(training, segments[i],
-                epochs=30,
-                batch_size=50,
-                shuffle=True,
-                validation_data=(testing, segments2[i]),
-                callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
-        segmentation_bank[i+2].save('/coe_data/MRIMath/MS_Research/model_' + str(i+2) +'.h5')
-        emailHandler = EmailHandler()
-        emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i+2) + " at " + str(datetime.now()));
-        emailHandler.sendMessage("Danny")
-        emailHandler.finish()
+    segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'.h5')
+    emailHandler = EmailHandler()
+    emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
+    emailHandler.sendMessage("Danny")
+    emailHandler.finish()
 
-        
-    with tf.device("/gpu:3"):
-        print('Training network: ' + str(i+3))
-        n_imgs = len(training)
-        training = np.array(training)
-        training =training.reshape(n_imgs,240,240,1)
-        training = training.astype('float32') / 255;
-        segments[i+3] = np.array(segments[i]);
-        segments[i+3] = segments[i+2].reshape(n_imgs,240,240,1)
-        n_imgs2 = len(testing)
-        testing = np.array(testing)
-        testing =testing.reshape(n_imgs2,240,240,1)
-        testing= testing.astype('float32') / 255;
-        segments2[i+3] = np.array(segments2[i+2]);
-        segments2[i+3] = segments2[i+2].reshape(n_imgs2,240,240,1)
-        segmentation_bank[i+3] = Model(input_img, decoded)
-        segmentation_bank[i+3].compile(optimizer='nadam', loss='mean_squared_error')
-        segmentation_bank[i+3].fit(training, segments[i],
-                epochs=30,
-                batch_size=50,
-                shuffle=True,
-                validation_data=(testing, segments2[i]),
-                callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
-        segmentation_bank[i+3].save('/coe_data/MRIMath/MS_Research/model_' + str(i+3) +'.h5')
-        emailHandler = EmailHandler()
-        emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i+3) + " at " + str(datetime.now()));
-        emailHandler.sendMessage("Danny")
-        emailHandler.finish()
+
+
+
 
 
 
