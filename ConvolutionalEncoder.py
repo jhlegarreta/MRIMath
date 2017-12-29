@@ -76,7 +76,7 @@ for i in range(0,8):
     segments2[i] = np.array(segments2[i]);
     segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
     segmentation_bank[i] = Model(input_img, decoded)
-    segmentation_bank[i] = multi_gpu_model(segmentation_bank[i], 4)
+    #segmentation_bank[i] = multi_gpu_model(segmentation_bank[i], 4)
     segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
     segmentation_bank[i].fit(training, segments[i],
                 epochs=30,
