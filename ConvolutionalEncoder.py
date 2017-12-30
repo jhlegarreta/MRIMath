@@ -91,9 +91,9 @@ for i in range(0,8):
                 #validation_data=(testing, segments2[i]),
                 #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
     segmentation_bank[i].fit_generator(
-        aug.flow(training, segments[i],batch_size=50*G),
+        aug.flow(training, segments[i],batch_size=50),
         validation_data=(testing, segments2[i]),
-        steps_per_epoch=len(training) // (50 * G),
+        steps_per_epoch=len(training) // (50),
         epochs=30,
         verbose=0)
     segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
