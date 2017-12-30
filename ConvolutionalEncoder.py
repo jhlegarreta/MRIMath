@@ -10,6 +10,7 @@ from datetime import datetime
 from keras.utils.training_utils import multi_gpu_model
 from tensorflow.contrib.learn.python.learn.graph_actions import train
 from keras.preprocessing.image import ImageDataGenerator
+import tensorflow as tf
 
 
 def get_im(path):
@@ -81,16 +82,17 @@ for i in range(0,8):
     testing= testing.astype('float32') / 255;
     segments2[i] = np.array(segments2[i]);
     segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
-    segmentation_bank[i] = Model(input_img, decoded)
-    segmentation_bank[i] = multi_gpu_model(segmentation_bank[i], G)
-    segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
-    segmentation_bank[i].fit(training, segments[i],
+    with tf.device('/cpu:0'):
+        segmentation_bank[i] = Model(input_img, decoded)
+    parallel_segmentation_bank = multi_gpu_model(segmentation_bank[i], G)
+    parallel_segmentation_bank.compile(optimizer='nadam', loss='mean_squared_error')
+    parallel_segmentation_bank.fit(training, segments[i],
             epochs=30,
             batch_size=50*G,
             shuffle=True,
             validation_data=(testing, segments2[i]))
             #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
-    segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
+    parallel_segmentation_bank.save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
     emailHandler = EmailHandler()
     emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
     emailHandler.sendMessage("Danny")
