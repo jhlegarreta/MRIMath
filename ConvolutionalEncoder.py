@@ -58,9 +58,9 @@ x = Conv2D(65, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(90, (F, F), activation='relu', padding='same')(x)
 decoded = Conv2D(1, (F, F), activation='relu', padding='same')(x)
 
-training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 10)
+training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 85)
 
-testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',11,15)
+testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',86,106)
 
 G = 4
 aug = ImageDataGenerator(width_shift_range=0.1,
@@ -91,11 +91,11 @@ for i in range(0,8):
                 #validation_data=(testing, segments2[i]),
                 #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
     segmentation_bank[i].fit_generator(
-        aug.flow(training, segments[i], batch_size=50 * G),
+        (training, segments[i]),
         validation_data=(testing, segments2[i]),
         steps_per_epoch=len(training) // (50 * G),
         epochs=30,
-        verbose=2)
+        verbose=0)
     segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
     emailHandler = EmailHandler()
     emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
