@@ -8,6 +8,8 @@ import cv2
 from EmailHandler import EmailHandler
 from datetime import datetime
 from keras.utils.training_utils import multi_gpu_model
+from tensorflow.contrib.learn.python.learn.graph_actions import train
+from keras.preprocessing.image import ImageDataGenerator
 
 
 def get_im(path):
@@ -60,6 +62,10 @@ training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Image
 
 testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',11,15)
 
+G = 4
+aug = ImageDataGenerator(width_shift_range=0.1,
+    height_shift_range=0.1, horizontal_flip=True,
+    fill_mode="nearest")
 segmentation_bank = [[] for _ in range(8)]
 for i in range(0,8):
     print('Training network: ' + str(i))
@@ -78,12 +84,18 @@ for i in range(0,8):
     segmentation_bank[i] = Model(input_img, decoded)
     segmentation_bank[i] = multi_gpu_model(segmentation_bank[i], 4)
     segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
-    segmentation_bank[i].fit_generator(training, segments[i],
-                epochs=30,
-                batch_size=50,
-                shuffle=True,
-                validation_data=(testing, segments2[i]),
-                callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
+    #segmentation_bank[i].fit(training, segments[i],
+                #epochs=30,
+                #batch_size=50,
+                #shuffle=True,
+                #validation_data=(testing, segments2[i]),
+                #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
+    segmentation_bank[i].fit_generator(
+        aug.flow(training, segments[i], batch_size=50 * G),
+        validation_data=(testing, segments2[i]),
+        steps_per_epoch=len(training) // (50 * G),
+        epochs=30,
+        verbose=2)
     segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
     emailHandler = EmailHandler()
     emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
