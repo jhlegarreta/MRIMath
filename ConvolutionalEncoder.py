@@ -58,9 +58,9 @@ x = Conv2D(65, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(90, (F, F), activation='relu', padding='same')(x)
 decoded = Conv2D(1, (F, F), activation='relu', padding='same')(x)
 
-training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 85)
+training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 86)
 
-testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',86,106)
+testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',86,107)
 
 G = 4
 aug = ImageDataGenerator(width_shift_range=0.1,
@@ -91,7 +91,7 @@ for i in range(0,8):
                 #validation_data=(testing, segments2[i]),
                 #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
     segmentation_bank[i].fit_generator(
-        (training, segments[i]),
+        aug.flow(training, segments[i],batch_size=50*G),
         validation_data=(testing, segments2[i]),
         steps_per_epoch=len(training) // (50 * G),
         epochs=30,
