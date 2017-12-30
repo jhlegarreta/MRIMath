@@ -92,7 +92,7 @@ for i in range(0,8):
             shuffle=True,
             validation_data=(testing, segments2[i]))
             #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
-    parallel_segmentation_bank.save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
+    segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
     emailHandler = EmailHandler()
     emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
     emailHandler.sendMessage("Danny")
