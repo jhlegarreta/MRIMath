@@ -82,20 +82,14 @@ for i in range(0,8):
     segments2[i] = np.array(segments2[i]);
     segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
     segmentation_bank[i] = Model(input_img, decoded)
-    segmentation_bank[i] = multi_gpu_model(segmentation_bank[i], 4)
+    segmentation_bank[i] = multi_gpu_model(segmentation_bank[i], G)
     segmentation_bank[i].compile(optimizer='nadam', loss='mean_squared_error')
-    #segmentation_bank[i].fit(training, segments[i],
-                #epochs=30,
-                #batch_size=50,
-                #shuffle=True,
-                #validation_data=(testing, segments2[i]),
-                #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
-    segmentation_bank[i].fit_generator(
-        aug.flow(training, segments[i],batch_size=50),
-        validation_data=(testing, segments2[i]),
-        steps_per_epoch=len(training) // (50),
-        epochs=30,
-        verbose=0)
+    segmentation_bank[i].fit(training, segments[i],
+            epochs=30,
+            batch_size=50*G,
+            shuffle=True,
+            validation_data=(testing, segments2[i]))
+            #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
     segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
     emailHandler = EmailHandler()
     emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
