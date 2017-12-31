@@ -88,7 +88,7 @@ for i in range(0,8):
     parallel_segmentation_bank.compile(optimizer='nadam', loss='mean_squared_error')
     parallel_segmentation_bank.fit(training, segments[i],
             epochs=25,
-            batch_size=64*G,
+            batch_size=32*G,
             shuffle=True,
             validation_data=(testing, segments2[i]))
             #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
