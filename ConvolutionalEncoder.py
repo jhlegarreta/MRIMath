@@ -2,14 +2,11 @@
 from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D
 from keras.models import Model
 import numpy as np
-from keras.callbacks import TensorBoard
 import os
 import cv2
 from EmailHandler import EmailHandler
 from datetime import datetime
 from keras.utils.training_utils import multi_gpu_model
-from tensorflow.contrib.learn.python.learn.graph_actions import train
-from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 
 
@@ -41,11 +38,14 @@ def load_data(training_directory, start, finish):
                 segments[int(ind.decode())-1].append(get_im(segment_directory+b'/'+dir+b'/'+file));
 
     return X_train, segments
-    
-input_img = Input(shape=(240, 240,1))  
-
+   
+   
 F = 3
-S = 2;
+S = 2 
+W, H = 240
+input_img = Input(shape=(W, H, 1))  
+
+
 
 x = Conv2D(90, (F, F), activation='relu', padding='same')(input_img)
 x = Conv2D(65, (F, F), activation='relu', padding='same')(x)
@@ -64,21 +64,19 @@ training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Image
 testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',86,107)
 
 G = 4
-aug = ImageDataGenerator(width_shift_range=0.1,
-    height_shift_range=0.1, horizontal_flip=True,
-    fill_mode="nearest")
+num_epochs = 40
 segmentation_bank = [[] for _ in range(8)]
 for i in range(0,8):
     print('Training network: ' + str(i))
     n_imgs = len(training)
     training = np.array(training)
-    training =training.reshape(n_imgs,240,240,1)
+    training =training.reshape(n_imgs,W,H,1)
     training = training.astype('float32') / 255;
     segments[i] = np.array(segments[i]);
-    segments[i] = segments[i].reshape(n_imgs,240,240,1)
+    segments[i] = segments[i].reshape(n_imgs,W,H,1)
     n_imgs2 = len(testing)
     testing = np.array(testing)
-    testing =testing.reshape(n_imgs2,240,240,1)
+    testing =testing.reshape(n_imgs2,W,H,1)
     testing= testing.astype('float32') / 255;
     segments2[i] = np.array(segments2[i]);
     segments2[i] = segments2[i].reshape(n_imgs2,240,240,1)
@@ -87,11 +85,10 @@ for i in range(0,8):
     parallel_segmentation_bank = multi_gpu_model(segmentation_bank[i], G)
     parallel_segmentation_bank.compile(optimizer='nadam', loss='mean_squared_error')
     parallel_segmentation_bank.fit(training, segments[i],
-            epochs=25,
-            batch_size=64*G,
+            epochs=num_epochs,
+            batch_size=32*G,
             shuffle=True,
             validation_data=(testing, segments2[i]))
-            #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
     segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
     emailHandler = EmailHandler()
     emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
