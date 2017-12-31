@@ -87,8 +87,8 @@ for i in range(0,8):
     parallel_segmentation_bank = multi_gpu_model(segmentation_bank[i], G)
     parallel_segmentation_bank.compile(optimizer='nadam', loss='mean_squared_error')
     parallel_segmentation_bank.fit(training, segments[i],
-            epochs=50,
-            batch_size=25*G,
+            epochs=25,
+            batch_size=64*G,
             shuffle=True,
             validation_data=(testing, segments2[i]))
             #callbacks=[TensorBoard(log_dir='/tmp/segment_data')])
