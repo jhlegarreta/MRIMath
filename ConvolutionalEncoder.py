@@ -47,7 +47,7 @@ input_img = Input(shape=(W, H, 1))
 
 
 
-x = Conv2D(90, (F, F), activation='relu', padding='same')(input_img)
+x = Conv2D(100, (F, F), activation='relu', padding='same')(input_img)
 x = Conv2D(65, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(35, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(15, (F, F), activation='relu', padding='same')(x)
@@ -56,15 +56,21 @@ x = UpSampling2D((S, S))(encoded)
 x = Conv2D(15, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(35, (F, F), activation='relu', padding='same')(x)
 x = Conv2D(65, (F, F), activation='relu', padding='same')(x)
-x = Conv2D(90, (F, F), activation='relu', padding='same')(x)
+x = Conv2D(100, (F, F), activation='relu', padding='same')(x)
 decoded = Conv2D(1, (F, F), activation='relu', padding='same')(x)
 
 training, segments = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images', 1, 86)
 
 testing, segments2 = load_data('/coe_data/MRIMath/MS_Research/Patient_Data_Images',86,107)
 
+emailHandler = EmailHandler()
+
+model_directory = "/coe_data/MRIMath/MS_Research/Models/" + datetime.year + "_" + datetime.month + "_" + datetime.day
+if not os.path.exists(model_directory):
+    os.makedirs(model_directory)
+    
 G = 4
-num_epochs = 40
+num_epochs = 50
 segmentation_bank = [[] for _ in range(8)]
 for i in range(0,8):
     print('Training network: ' + str(i))
@@ -89,9 +95,9 @@ for i in range(0,8):
             batch_size=32*G,
             shuffle=True,
             validation_data=(testing, segments2[i]))
-    segmentation_bank[i].save('/coe_data/MRIMath/MS_Research/model_' + str(i) +'_2.h5')
-    emailHandler = EmailHandler()
-    emailHandler.prepareMessage("Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
+    segmentation_bank[i].save(model_directory + '/model_' + str(i) +'.h5')
+    emailHandler.connectToServer()
+    emailHandler.prepareMessage("Network Training Finished!", "Finished training network " + str(i) + " at " + str(datetime.now()));
     emailHandler.sendMessage("Danny")
     emailHandler.finish()
 
