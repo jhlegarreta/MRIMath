@@ -1,2 +1,0 @@
-epoch,dice_coef,hausdorff_dist,loss,val_dice_coef,val_hausdorff_dist,val_loss
-0,0.12361714405857999,nan,nan,0.07933911873084126,nan,nan
